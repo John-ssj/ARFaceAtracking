@@ -33,6 +33,7 @@ class GameScene: SKScene {
     //MARK: - private初始化函数
     private func setUpScene() {
         //背景图片
+        print(self.size)
         let backgroundImage = SKSpriteNode(imageNamed: "background")
         backgroundImage.size = self.size
         backgroundImage.position = CGPoint(x: self.size.width/2, y: self.size.height/2)

@@ -12,10 +12,12 @@ class GameViewController: UIViewController {
     
     var gestureView = GestureDrawView(frame: UIScreen.main.bounds)
     
-    var gameScene = GameScene()
+    // gameScene在class生成后加载。不然可能屏幕没有初始化，长宽互换。
+    var gameScene: GameScene?
     lazy var skView: SKView = {
         let skView = SKView(frame: self.view.bounds)
-        skView.presentScene(gameScene)
+        gameScene = GameScene()
+        skView.presentScene(gameScene!)
         skView.showsFPS = true
         skView.showsNodeCount = true
         return skView
@@ -37,10 +39,28 @@ class GameViewController: UIViewController {
     }()
     
     override func viewDidLoad() {
-        setUpGameView()
+        super.viewDidLoad()
+        print(self.view.bounds)
         
-        gameScene.startGame()
+        loadGameData()
+        setUpGameView()
 //        autoPlay()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        skView.presentScene(gameScene)
+        gameScene?.startGame()
+    }
+    
+    //MARK: - 异步加载游戏数据
+    private func loadGameData() {
+        DispatchQueue.global().async {
+            _ = GameAudio.share
+            _ = SKVirusNode.gifResource
+            _ = SKVirusNode.pngResource
+        }
     }
     
     //MARK: - 自动游戏
@@ -74,7 +94,7 @@ class GameViewController: UIViewController {
         GameCenter.shared.gameState = .paused
         
         self.settingView.open()
-        self.gameScene.pauseGame()
+        self.gameScene?.pauseGame()
     }
     
     @objc func GameEnd() {
@@ -83,7 +103,7 @@ class GameViewController: UIViewController {
     }
     
     @objc func StartGame() {
-        self.gameScene.startGame()
+        self.gameScene?.startGame()
     }
     
     @objc func OpenDesignView() {
@@ -116,11 +136,11 @@ extension GameViewController: UIGestureRecognizerDelegate {
 extension GameViewController: SettingViewDelegate {
     func settingViewClose() {
         if GameCenter.shared.gameState == .paused {
-            self.gameScene.continueGame()
+            self.gameScene?.continueGame()
         }
     }
     
     func restartGame() {
-        self.gameScene.startGame()
+        self.gameScene?.startGame()
     }
 }

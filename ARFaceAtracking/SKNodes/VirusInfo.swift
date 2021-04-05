@@ -35,9 +35,9 @@ class VirusInfo: NSObject{
         self.duration = (InfoDic["duration"] as! CGFloat)
         self.frameNum = (InfoDic["frameNum"] as! CGFloat)
         self.moveSpeed = (InfoDic["moveSpeed"] as! CGFloat) * 6
-        if (type == .normalVirus) {
-            self.moveSpeed = CGFloat.random(in: self.moveSpeed-20...self.moveSpeed+20)
-        }
+//        if (type == .normalVirus) {
+//            self.moveSpeed = CGFloat.random(in: self.moveSpeed-20...self.moveSpeed+20)
+//        }
     }
     
     private func getJsonInfo() -> [String: Any]? {
@@ -55,9 +55,10 @@ class VirusInfo: NSObject{
     }
     
     private func getSize() -> CGSize {
+        let scale: CGFloat = 2
         let sizeDic = (InfoDic["size"] as! [String: Any])
         let height = (sizeDic["hight"] as! CGFloat)
         let width = (sizeDic["width"] as! CGFloat)
-        return CGSize(width: width, height: height)
+        return CGSize(width: width*scale, height: height*scale)
     }
 }

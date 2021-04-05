@@ -38,7 +38,7 @@ class GameAudio {
                 print(err.localizedDescription)
             }
         }
-        print("load Mp3 Success!")
+        print("load mp3 Success!")
     }
     
     func playAudio(audio: AudioName) {

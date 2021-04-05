@@ -45,10 +45,6 @@ public class SKVirusNode: SKSpriteNode {
     }
     
     convenience init(virusName: VirusNames) {
-        DispatchQueue.global().async {
-            _ = SKVirusNode.pngResource
-            _ = SKVirusNode.gifResource
-        }
         self.init(color: .clear, size: CGSize.zero)
         self.virusName = virusName
         setUpVirus()
@@ -86,7 +82,7 @@ extension SKVirusNode {
             let textures = images.map {SKTexture(image: $0)}
             dic[virus] = textures
         }
-        print("gifResource loadsuccess!")
+        print("load gif Success!")
         return dic
     }()
 
@@ -98,6 +94,7 @@ extension SKVirusNode {
                   let image = UIImage(contentsOfFile: path) else { continue }
             dic.append(SKTexture(image: image))
         }
+        print("load png Success!")
         return dic
     }()
 

@@ -40,6 +40,9 @@ class GameManager: NSObject {
     var delegate: GameManagerDelegate!
     
     
+    private var width: CGFloat {UIScreen.main.bounds.width}
+    private var height: CGFloat {UIScreen.main.bounds.height}
+    
     // MARK: - init
     override init() {
         super.init()
@@ -51,7 +54,6 @@ class GameManager: NSObject {
     // MARK: - public函数
     func startGame() {
         guard GameCenter.shared.gameState == .start else { return }
-        _ = GameAudio.share //初始化声音
         magician?.removeFromParent()
         magician = MagicianNode()
         if magician != nil {
@@ -99,19 +101,38 @@ class GameManager: NSObject {
             }
         }
         if virusDic.keys.contains(Int(self.time)) {
-            for virus in virusDic[Int(self.time)]! {
-                for _ in 0..<virus.value{
-                    let virusNode = SKVirusNode(virusName: virus.key)
-                    virusNode.position = getVirusP()
-                    self.delegate.addToView(node: virusNode)
-                }
-            }
+            newVirus()
+//            for virus in virusDic[Int(self.time)]! {
+//                for _ in 0..<virus.value{
+//                    let virusNode = SKVirusNode(virusName: virus.key)
+//                    virusNode.position = getRandomVirusP()
+//                    self.delegate.addToView(node: virusNode)
+//                }
+//            }
         }
         if self.time > self.endTime + 3,
            GameCenter.shared.getBlood() > 0,
            self.delegate.allVirusDied() {
             GameCenter.shared.gameState = .win
             self.gameTimer?.invalidate()
+        }
+    }
+    
+    // MARK: - 新游戏模式设计
+    private func newVirus() {
+        createYellowTail()
+    }
+    
+    private func createYellowTail() {
+        let oringeP = CGPoint(x: self.width, y: self.height/2)
+        for i in 0..<6 {
+            let vNum = i<3 ? i : 3
+            for j in -vNum...vNum {
+                let virusNode = SKVirusNode(virusName: .yellowTail)
+                virusNode.position = CGPoint(x: oringeP.x+(virusNode.size.width+50)*CGFloat(i-1),
+                                             y: oringeP.y+(virusNode.size.height+50)*CGFloat(j))
+                self.delegate.addToView(node: virusNode)
+            }
         }
     }
 }
@@ -202,7 +223,7 @@ extension GameManager {
         case right
     }
     
-    private func getVirusP(dir direction: Direction? = nil) -> CGPoint {
+    private func getRandomVirusP(dir direction: Direction? = nil) -> CGPoint {
         var dir = direction
         if dir == nil {
             // 有1/6的概率从上下出现，其他从左右出现。70%概率从远点那一边出现

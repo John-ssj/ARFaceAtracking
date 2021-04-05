@@ -86,7 +86,7 @@ enum ResultType: Int, CaseIterable {
     
     var color: UIColor {
         switch self {
-        case .unkonw: return #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+        case .unkonw: return #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
         case .left: return #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 1)
         case .right: return #colorLiteral(red: 1, green: 0.4932718873, blue: 0.4739984274, alpha: 1)
         case .up: return #colorLiteral(red: 1, green: 0.5781051517, blue: 0, alpha: 1)

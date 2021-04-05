@@ -39,7 +39,7 @@ public class GameCenter {
     /** 目前血量 */
     private var presentBlood = GameCenter.maxBlood
     /** 魔术师在屏幕的位置 */
-    var magicianPoint = CGPoint(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2)
+    var magicianPoint = CGPoint(x: 120, y: UIScreen.main.bounds.height/2)
     /** 现在运行的游戏关卡数据 */
     private var virusDic: [Int: [VirusNames: Int]]!
     
