@@ -9,13 +9,23 @@ import UIKit
 
 class VirusInfo: NSObject{
     
+    static var All: [VirusNames: VirusInfo] = {
+        var all = [VirusNames: VirusInfo]()
+        for i in VirusNames.allCases {
+            let info = VirusInfo()
+            info.setUpInfo(type: i)
+            all[i] = info
+        }
+        return all
+    }()
+    
     private var InfoDic: [String: Any]!
     
     var type: VirusNames!
     var animated: Bool!
     var isEasy: Bool!
     var lenth: Int!
-    var virusSize: CGSize!
+    var size: CGSize!
     var radius: CGFloat!
     var duration: CGFloat!
     var frameNum: CGFloat!
@@ -27,7 +37,7 @@ class VirusInfo: NSObject{
     func setUpInfo(type: VirusNames) {
         self.type = type
         self.InfoDic = getJsonInfo()!
-        self.virusSize = getSize()
+        self.size = getSize()
         self.animated = ((InfoDic["animated"] as! Int) == 1)
         self.isEasy = ((InfoDic["isEasy"] as! Int) == 1)
         self.lenth = (InfoDic["lenth"] as! Int)

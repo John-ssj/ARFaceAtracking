@@ -58,6 +58,7 @@ class GameViewController: UIViewController {
     //MARK: - 异步加载游戏数据
     private func loadGameData() {
         DispatchQueue.global().async {
+            _ = VirusInfo.All
             _ = GameAudio.share
             _ = SKVirusNode.gifResource
             _ = SKVirusNode.pngResource

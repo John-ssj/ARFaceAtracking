@@ -19,12 +19,16 @@ class SymbolNode: SKSpriteNode {
     
     /** 是否接收标记符号 */
     var receiveSymbols = true
+    /** 是否检测碰撞 */
+    var attackTest = true
     /** 尺寸大小 */
     var textureSize = CGSize(width: 80, height: 80) { didSet{ setSize() } }
-    /** 是否向target移动 */
-    var autoMove = true { didSet{ moveToTarget() } }
+    /** 自动移动方式:向targetP移动，向某点移动，不移动 */
+    var autoMove = MovingMode.noMove { didSet{ autoMoveAction() } }
+    /** 移动方向 */
+    var movingDir: CGVector? = nil { didSet{ autoMoveAction() } }
     /** 移动速度 */
-    var movingSpeed: CGFloat = 50 { didSet{ moveToTarget() } }
+    var movingSpeed: CGFloat = 50 { didSet{ autoMoveAction() } }
     /** 是否需要physicalBody */
     var createPhysicBody = true { didSet{ setUpPhysicsBody() } }
     /** 首标记被清除后，是否显示朦层变化 */
@@ -36,6 +40,9 @@ class SymbolNode: SKSpriteNode {
     var distance: CGFloat { hypot(self.targetP.x-self.position.x,
                                   self.targetP.y-self.position.y) }
     
+    /** 每0.5秒进行一次碰撞检测 */
+    private var atackTimer: Timer?
+    
     
     //MARK: - SubNodes
     
@@ -46,16 +53,13 @@ class SymbolNode: SKSpriteNode {
     /** 朦层 */
     private var maskNode: SKShapeNode!
     
-    private var atackTimer: Timer! // 计时器。每0.5秒进行一次碰撞检测
-    private var specialTimer: Timer?
-    
     
     //MARK: - 初始化
-    
-    convenience init(receiveSym: Bool = true, move: Bool = true, changeM: Bool = false, physicBody: Bool = true) {
-        self.init(color: .clear, size: CGSize.zero)
+    init(receiveSym: Bool = true, attack: Bool = true, move: MovingMode = .noMove, changeM: Bool = false, physicBody: Bool = true) {
+        super.init(texture: nil, color: .clear, size: .zero)
         
         self.receiveSymbols = receiveSym
+        self.attackTest = attack
         self.autoMove = move
         self.changeMask = changeM
         self.createPhysicBody = physicBody
@@ -63,11 +67,20 @@ class SymbolNode: SKSpriteNode {
         setUpNodes()
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        self.atackTimer?.invalidate()
+    }
+    
 }
 
 
-//MARK: - private func
 extension SymbolNode{
+    
+    //MARK: - setUpNode
     
     /** 初始化所有Node */
     private func setUpNodes() {
@@ -90,6 +103,13 @@ extension SymbolNode{
         
         setSize()
         setUpPhysicsBody()
+        
+        self.atackTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true, block: { _ in
+            guard self.attackTest, self.nodeState == .running else { return }
+            if self.distance <= GameCenter.shared.magicianRadius + self.size.width*1.2 {
+                self.attackMagician()
+            }
+        })
         
         NotificationCenter.default.addObserver(self, selector: #selector(receiveSign(noti:)), name: NSNotification.Name("gestureSign"), object: nil)
     }
@@ -155,13 +175,32 @@ extension SymbolNode{
         return
     }
     
-    /** 向目标移动 */
-    /// - parameter speed: 移动速度
-    private func moveToTarget() {
-        guard self.autoMove, self.nodeState == .running else { return }
+    
+    //MARK: - nodeMove
+    
+    /** 自动移动:向targetP移动，向某点移动，不移动 */
+    private func autoMoveAction() {
         self.removeAction(forKey: "moveAction")
-        let moveAction = SKAction.move(to: self.targetP, duration: TimeInterval(distance / self.movingSpeed))
-        self.run(moveAction, withKey: "moveAction")
+        guard self.autoMove != .noMove, self.nodeState == .running else { return }
+        
+        //向targetP移动
+        if self.autoMove == .toPoint {
+            let moveAction = SKAction.move(to: self.targetP, duration: TimeInterval(distance / self.movingSpeed))
+            self.run(moveAction, withKey: "moveAction")
+        }
+        
+        //向某方向移动
+        if self.autoMove == .toDir {
+            guard let dir = self.movingDir else { return }
+            let lenth = hypot(dir.dx, dir.dy)
+            let totalLenth = hypot(UIScreen.main.bounds.width, UIScreen.main.bounds.height)*2
+            let alpha = totalLenth/lenth
+            let moveAction = SKAction.move(by: CGVector(dx: dir.dx*alpha, dy: dir.dy*alpha),
+                                           duration: TimeInterval(totalLenth/self.movingSpeed))
+            let moveAndOutAction = SKAction.sequence([moveAction,
+                                       .run{ self.nodeState = .disappearing }])
+            self.run(moveAndOutAction, withKey: "moveAction")
+        }
     }
     
     /** 生成物理模型，防止重叠 */
@@ -191,6 +230,41 @@ extension SymbolNode{
 //MARK: - public func
 extension SymbolNode{
     
+    /** 随机符号字符串 */
+    final func RandomSymbols(lenth: Int, isEasy: Bool) -> String {
+        var label = ""
+        let typeList = isEasy ? ResultType.easyTypes : ResultType.allVirusTypes
+        for _ in 0..<lenth {
+            label += typeList.randomElement()!
+        }
+        return label
+    }
+    
+    /** 定制符号字符串 */
+    /// - parameter str: 输入字符串，
+    /// 属于allVirusTypes则不变，
+    /// "?"变成任意type，
+    /// "E"变成简单type，
+    /// "H"变成复杂tpye，
+    /// "."变成前一个type，
+    /// 其他跳过。
+    final func CustomizeSymbols(_ str: String) -> String {
+        var label = ""
+        var pre = ResultType.up.stringValue
+        for i in 0..<str.count {
+            if ResultType.allVirusTypes.contains(str[i]) { pre = str[i] }
+            switch str[i] {
+            case "?": pre = ResultType.allVirusTypes.randomElement()!
+            case "E": pre = ResultType.easyTypes.randomElement()!
+            case "H": pre = ResultType.hardTypes.randomElement()!
+            case ".": break
+            default: continue
+            }
+            label += pre
+        }
+        return label
+    }
+    
     /** 设置gif播放,添加textureAction */
     /// - parameter textures: gif图片数组
     /// - parameter frameTime: 每张gif图片刷新时间间隔
@@ -214,20 +288,8 @@ extension SymbolNode{
     
     /** 直接向目标移动 */
     final func moveToTarget(speed: CGFloat) {
-        guard self.nodeState != .setup else { return }
         self.removeAction(forKey: "moveAction")
         let moveAction = SKAction.move(to: self.targetP, duration: TimeInterval(distance / speed))
-        self.run(moveAction, withKey: "moveAction")
-    }
-    
-    /** 直接向某方向移动 */
-    final func moveTo(direction dir: CGVector, speed: CGFloat) {
-        guard self.nodeState != .setup else { return }
-        self.removeAction(forKey: "moveAction")
-        let lenth = hypot(dir.dx, dir.dy)
-        let totalLenth = hypot(UIScreen.main.bounds.width, UIScreen.main.bounds.height)*2
-        let alpha = totalLenth/lenth
-        let moveAction = SKAction.move(by: CGVector(dx: dir.dx*alpha, dy: dir.dy*alpha), duration: TimeInterval(totalLenth/speed))
         self.run(moveAction, withKey: "moveAction")
     }
     
@@ -251,13 +313,13 @@ extension SymbolNode{
     func loadSuccess() {
         //使Node可见
         self.isHidden = false
-        moveToTarget()
+        autoMoveAction()
     }
     
     /** node消失动画 */
     // TODO: - override,添加声音等,需要在函数尾部添加self.nodeState = .end
     // 或者改变nodeState为.running
-    func nodeDisappear() {
+    @objc func nodeDisappear() {
         self.removeAllActions()
         self.nodeState = .end
     }
@@ -265,6 +327,12 @@ extension SymbolNode{
     /** 释放node */
     func releaseNode() {
         self.removeFromParent()
+    }
+    
+    /** node碰到magician */
+    // TODO: - override,添加声音等,需要在函数尾部添加self.nodeState = .end
+    func attackMagician() {
+        self.nodeState = .end
     }
 }
 
@@ -274,4 +342,10 @@ enum NodeState {
     case running
     case disappearing
     case end
+}
+
+enum MovingMode {
+    case toPoint
+    case toDir
+    case noMove
 }

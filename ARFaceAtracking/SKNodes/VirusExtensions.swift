@@ -98,6 +98,7 @@ enum ResultType: Int, CaseIterable {
     }
     
     static let easyTypes = ["←", "→", "↑", "↓"]
+    static let hardTypes = ["v", "ʌ"]
     static let allVirusTypes = ["←", "→", "↑", "↓", "v", "ʌ"]
 }
 

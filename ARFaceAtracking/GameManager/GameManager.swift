@@ -172,47 +172,48 @@ extension GameManager {
     @objc private func addBlast(noti: Notification) {
         guard let point = noti.userInfo?["point"] as? CGPoint else { return }
         
-        let path = CGMutablePath()
-        let r: CGFloat = 50
-        let num = 12
-        path.move(to: CGPoint(x: r, y: 0))
-        for alpha in 1...num {
-            let a = CGFloat(alpha)/CGFloat(num) * 2 * CGFloat.pi
-            let p1 = CGPoint(x: r * cos(a),
-                             y: r * sin(a))
-            let b = CGFloat(alpha*3-1)/CGFloat(3*num) * 2 * CGFloat.pi
-            let dr2 = CGFloat(Int.random(from: -3, to: 4))
-            let p2 = CGPoint(x: (r + dr2) * cos(b),
-                             y: (r + dr2) * sin(b))
-            let c = CGFloat(alpha*3-2)/CGFloat(3*num) * 2 * CGFloat.pi
-            let dr3 = CGFloat(Int.random(from: -3, to: 4))
-            let p3 = CGPoint(x: (r + dr3) * cos(c),
-                             y: (r + dr3) * sin(c))
-            path.addCurve(to: p1, control1: p2, control2: p3)
-        }
-        path.closeSubpath()
+//        let path = CGMutablePath()
+//        let r: CGFloat = 50
+//        let num = 12
+//        path.move(to: CGPoint(x: r, y: 0))
+//        for alpha in 1...num {
+//            let a = CGFloat(alpha)/CGFloat(num) * 2 * CGFloat.pi
+//            let p1 = CGPoint(x: r * cos(a),
+//                             y: r * sin(a))
+//            let b = CGFloat(alpha*3-1)/CGFloat(3*num) * 2 * CGFloat.pi
+//            let dr2 = CGFloat(Int.random(from: -3, to: 4))
+//            let p2 = CGPoint(x: (r + dr2) * cos(b),
+//                             y: (r + dr2) * sin(b))
+//            let c = CGFloat(alpha*3-2)/CGFloat(3*num) * 2 * CGFloat.pi
+//            let dr3 = CGFloat(Int.random(from: -3, to: 4))
+//            let p3 = CGPoint(x: (r + dr3) * cos(c),
+//                             y: (r + dr3) * sin(c))
+//            path.addCurve(to: p1, control1: p2, control2: p3)
+//        }
+//        path.closeSubpath()
         
-        let blastNode = SKShapeNode()
+        let blastNode = SKSpriteNode()
+        blastNode.texture = SKTexture(imageNamed: "png/blast")
         blastNode.name = "blastNode"
-        blastNode.path = path
-        blastNode.strokeColor = #colorLiteral(red: 0.7980566621, green: 0.7973025441, blue: 0.1943252981, alpha: 1)
-        blastNode.fillColor = #colorLiteral(red: 0.7980566621, green: 0.7973025441, blue: 0.1943252981, alpha: 1)
+//        blastNode.path = path
+//        blastNode.strokeColor = #colorLiteral(red: 0.7980566621, green: 0.7973025441, blue: 0.1943252981, alpha: 1)
+//        blastNode.fillColor = #colorLiteral(red: 0.7980566621, green: 0.7973025441, blue: 0.1943252981, alpha: 1)
         blastNode.zPosition = 2
         blastNode.position = point
         blastNode.setScale(0.3)
         blastNode.alpha = 0.8
         self.delegate.addToView(node: blastNode)
+        
+        //先放大，保持5秒不变，然后变淡消失。
         let scaleAction = SKAction.scale(to: 3, duration: 0.1)
         scaleAction.timingMode = .easeIn
-        blastNode.run(scaleAction)
-        //前5秒不变，然后变淡消失。利用SKAction可以保证前5s在暂停的时候不消失。
-        blastNode.run(SKAction.fadeAlpha(to: 1, duration: 5)) {
-            let disappearAction = SKAction.fadeAlpha(to: 0, duration: 1)
-            disappearAction.timingMode = .easeOut
-            blastNode.run(disappearAction) {
-                blastNode.removeFromParent()
-            }
-        }
+        let fadeAction = SKAction.fadeAlpha(to: 0, duration: 1)
+        fadeAction.timingMode = .easeOut
+        let balstAction = SKAction.sequence([scaleAction,
+                                                 .wait(forDuration: 5),
+                                                 fadeAction,
+                                                 .removeFromParent()])
+        blastNode.run(balstAction)
     }
     
     // MARK: - new virus生成的位置

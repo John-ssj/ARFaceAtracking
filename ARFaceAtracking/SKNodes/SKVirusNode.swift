@@ -201,7 +201,7 @@ extension SKVirusNode {
         self.virusInfo.setUpInfo(type: virusName)
         // 判断是gif还是图片
         textureNode = SKSpriteNode()
-        textureNode.size = self.virusInfo.virusSize
+        textureNode.size = self.virusInfo.size
         if virusInfo.animated {
             textureNode.removeAction(forKey: "gifAction")
             loadTextureGif()
