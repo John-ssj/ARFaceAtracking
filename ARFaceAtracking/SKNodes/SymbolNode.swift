@@ -221,13 +221,13 @@ extension SymbolNode{
     }
     
     /** 直接向某方向移动 */
-    final func moveTo(direction dir: CGVector) {
+    final func moveTo(direction dir: CGVector, speed: CGFloat) {
         guard self.nodeState != .setup else { return }
         self.removeAction(forKey: "moveAction")
         let lenth = hypot(dir.dx, dir.dy)
-        
-        let moveAction = SKAction.move(by: CGVector(dx: <#T##CGFloat#>, dy: <#T##CGFloat#>), duration: <#T##TimeInterval#>)
-//        (to: self.targetP, duration: TimeInterval(distance / speed))
+        let totalLenth = hypot(UIScreen.main.bounds.width, UIScreen.main.bounds.height)*2
+        let alpha = totalLenth/lenth
+        let moveAction = SKAction.move(by: CGVector(dx: dir.dx*alpha, dy: dir.dy*alpha), duration: TimeInterval(totalLenth/speed))
         self.run(moveAction, withKey: "moveAction")
     }
     
