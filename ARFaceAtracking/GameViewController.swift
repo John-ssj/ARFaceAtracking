@@ -45,6 +45,7 @@ class GameViewController: UIViewController {
         loadGameData()
         setUpGameView()
 //        autoPlay()
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {

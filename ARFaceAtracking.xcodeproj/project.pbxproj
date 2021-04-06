@@ -37,7 +37,7 @@
 		18C7506125D22AEA002F0602 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18C7505F25D22AEA002F0602 /* Main.storyboard */; };
 		18C7506325D22AEB002F0602 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18C7506225D22AEB002F0602 /* Assets.xcassets */; };
 		18C7506625D22AEB002F0602 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18C7506425D22AEB002F0602 /* LaunchScreen.storyboard */; };
-		7B406D7B261B43DF003358BF /* VriusNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B406D7A261B43DF003358BF /* VriusNode.swift */; };
+		7B406D7B261B43DF003358BF /* VirusNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B406D7A261B43DF003358BF /* VirusNode.swift */; };
 		7B406D7E261B44A9003358BF /* SymbolNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B406D7D261B44A9003358BF /* SymbolNode.swift */; };
 /* End PBXBuildFile section */
 
@@ -75,7 +75,7 @@
 		18C7506225D22AEB002F0602 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		18C7506525D22AEB002F0602 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		18C7506725D22AEB002F0602 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7B406D7A261B43DF003358BF /* VriusNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VriusNode.swift; sourceTree = "<group>"; };
+		7B406D7A261B43DF003358BF /* VirusNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirusNode.swift; sourceTree = "<group>"; };
 		7B406D7D261B44A9003358BF /* SymbolNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolNode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -119,7 +119,7 @@
 				18A1EAF125FB41A00048B0EE /* SKBloodNode.swift */,
 				1869B96825E36E51000BE12E /* SKVirusNode.swift */,
 				7B406D7D261B44A9003358BF /* SymbolNode.swift */,
-				7B406D7A261B43DF003358BF /* VriusNode.swift */,
+				7B406D7A261B43DF003358BF /* VirusNode.swift */,
 				1869B97825E39A1B000BE12E /* VirusInfo.swift */,
 				1869B97E25E3B10F000BE12E /* VirusExtensions.swift */,
 				1869B97025E376CD000BE12E /* VirusInfo.json */,
@@ -268,7 +268,7 @@
 				18ACF39C25ECDF3900E1593B /* RowView.swift in Sources */,
 				1869B97F25E3B10F000BE12E /* VirusExtensions.swift in Sources */,
 				182EC65B25DBE3D0001EC2B4 /* GameGestureRecognizer.swift in Sources */,
-				7B406D7B261B43DF003358BF /* VriusNode.swift in Sources */,
+				7B406D7B261B43DF003358BF /* VirusNode.swift in Sources */,
 				180D9D1B25F71941009FDF7C /* GameScene.swift in Sources */,
 				18C7505C25D22AEA002F0602 /* SceneDelegate.swift in Sources */,
 				18B62D5126118451002CA929 /* GameAudio.swift in Sources */,

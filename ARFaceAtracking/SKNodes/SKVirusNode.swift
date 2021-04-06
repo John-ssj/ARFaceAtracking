@@ -177,10 +177,8 @@ extension SKVirusNode {
                     self.maskNode.fillColor = UIColor.clear
                 }
             }else{
-                if self.gameLabel == "" {
-                    GameCenter.shared.addScore(virus: self.virusName)
-                    self.shouldDismiss = true
-                }
+                GameCenter.shared.addScore(virus: self.virusName)
+                self.shouldDismiss = true
             }
         }
         return
